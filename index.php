@@ -14,10 +14,14 @@ $PWS = new MOW_Prestashop_Web_Service([
     'debug' => false
 ]);
 
-include_once( 'views/customers.tpl.php' );
+$resource_name = 'customers';
 
-//$ws->create_customer();
-//$ws->delete_resource('customers',8);
+//var_dump($PWS->read_resource_all($resource_name));
+
+include_once( "views/$resource_name.tpl.php" );
+
+//$ws->create_image_type();
+//$ws->delete_resource('image_types',8);
 
 
 

@@ -1,22 +1,16 @@
-<html>
-
-    <head>
-        <title>TEST</title>
-    </head>
-
-</html>
-
-<?php
-require_once( '../PSWebServiceLibrary.php' );
-
-$valid_resources = ['categories', 'customers'];
-
-// check if valid resource are given
-if (in_array($valid_resources, $resource)) {
-    throw new Exception('Invalid resource');
-}
-
-if (in_array('d', $tab))
-    echo 'yes';
-else
-    echo 'false';
+'id',
+'unremovable',
+'delivery',
+'hidden',
+'send_email',
+'module_name',
+'invoice',
+'color',
+'logable',
+'shipped',
+'paid',
+'pdf_delivery',
+'pdf_invoice',
+'deleted',
+'name',
+'template',

@@ -21,7 +21,8 @@ use Core\Classes\Util\MOW_Utils_HTML as MUHTML;
 class MOW_Prestashop_Web_Service {
 
     // à compléter ...
-    const AVAILABLE_RESOURCES = ['addresses',
+    const AVAILABLE_RESOURCES = [
+        'addresses',
         'carriers',
         'cart_rules',
         'carts',
@@ -111,7 +112,9 @@ class MOW_Prestashop_Web_Service {
     private $current_id;
     // request options
     private $current_options;
-    // response parsed as SimpleXML
+    // READ response parsed. Can be of two types:
+    // -  SimpleXML if simple request (using the read_resource() method
+    // -  array of SimpleXML if detailed request (using the read_resource_all() method)
     private $retrieved_resource;
 
     public function __construct($options) {
@@ -172,14 +175,35 @@ class MOW_Prestashop_Web_Service {
 
         return $this->retrieved_resource;
     }
-
-    function read_ressource_all($resource) {
+    
+    /**
+     * loops over each resources from a group then return an array of SimpleXML objects
+     * 
+     * @param type $resource_name
+     * @return array
+     */
+    function read_resource_all($resource_name, $level = 0) {
         $resources = [];
+        // SimpleXML with the resources list that contains only the single resources id
+        $xml_list = null;
+        // single resource at the current iteration in the foreach loop
+        $current_single_resource = null;
+        // single resource id at the current iteration in the foreach loop
+        $current_resource_id = 0;
 
-        // loops over each resources from a group then return an array of SimpleXML objects
         // first : retrieve the resources list from the read_resource($resource_name) method
+        $xml_list = $this->read_resource($resource_name);
+  
         // second : loop over each resource from the list and make a call to read_resource($resource_name, $id) specifying the id
-
+        // $single_resource_content is a SimpleXML object that contains the single resource data and attributes
+        foreach ( $xml_list as $single_resource_name => $single_resource_content ) {
+            $current_resource_id = $single_resource_content->attributes()['id'];
+            $current_single_resource = $this->read_resource($resource_name, $current_resource_id);
+            $resources[] = $current_single_resource;
+        }
+        
+        $this->retrieved_resource = $resources;
+        
         return $resources;
     }
 
@@ -191,10 +215,10 @@ class MOW_Prestashop_Web_Service {
      * @throws Exception
      */
     private function create_resource($resource) {
-        $valid_resources = ['categories', 'customers', 'products'];
+        //$valid_resources = ['categories', 'customers', 'products'];
 
         // check if valid resource are given
-        if (!in_array($resource, $valid_resources)) {
+        if (!in_array($resource, $this->AVAILABLE_RESOURCES)) {
             throw new Exception('Invalid resource');
         }
 
